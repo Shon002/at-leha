@@ -111,6 +111,12 @@ h2 {
 .stats b { font: 700 22px/1.2 var(--font-head); }
 .stats .left b { color: var(--accent); }
 
+.need {
+  margin-top: 18px; padding: 12px 14px; border-radius: 12px;
+  background: color-mix(in srgb, var(--accent) 7%, transparent);
+}
+.need small { display: block; color: var(--muted); font-weight: 700; font-size: 13px; margin-bottom: 4px; }
+
 /* кнопки */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
@@ -193,7 +199,9 @@ input[type="file"] { padding: 9px; }
 }
 .savebar .msg { margin: 0; }
 .mrow { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; align-items: end; padding: 10px 0; border-top: 1px solid var(--line); }
-.mrow .mname { grid-column: 1 / -1; font-weight: 700; }
+.mrow .mname, .mrow .mnote { grid-column: 1 / -1; }
+.mrow .mname { font-weight: 700; }
+.mrow textarea { min-height: 60px; }
 .mrow label { margin: 0 0 4px; font-weight: 600; font-size: 13px; color: var(--muted); }
 .adm-post { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-top: 1px solid var(--line); }
 .adm-post:first-child { border-top: 0; }

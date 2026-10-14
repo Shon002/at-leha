@@ -294,6 +294,7 @@ function renderMonths() {
   $('collLabel').textContent = 'Собрано за ' + curName + ', ₽';
   $('goalIn').value = cur.goal || '';
   $('collIn').value = cur.collected || '';
+  $('noteIn').value = cur.note || '';
   $('newMonthBtn').textContent = 'Начать новый месяц: ' + monthLabel(nextYm(cur.month));
   updatePreview();
 
@@ -316,11 +317,18 @@ function renderMonths() {
       renderMonths();
       markDirty();
     });
+    const note = document.createElement('textarea');
+    note.rows = 2;
+    note.value = m.note || '';
+    note.addEventListener('input', () => { m.note = note.value; markDirty(); });
+    const noteBox = labeled('На что', note);
+    noteBox.className = 'mnote';
     row.append(
       name,
       labeled('Цель, ₽', numInput(m.goal, (v) => { m.goal = v; })),
       labeled('Собрано, ₽', numInput(m.collected, (v) => { m.collected = v; })),
-      del);
+      del,
+      noteBox);
     list.append(row);
   });
   if (data.months.length > 1) {
@@ -354,11 +362,15 @@ $('collIn').addEventListener('input', () => {
   markDirty();
   updatePreview();
 });
+$('noteIn').addEventListener('input', () => {
+  data.months[0].note = $('noteIn').value;
+  markDirty();
+});
 $('newMonthBtn').addEventListener('click', () => {
   const cur = data.months[0];
   const nm = nextYm(cur.month);
-  if (!confirm('Начать ' + monthLabel(nm) + '? ' + monthLabel(cur.month) + ' уйдёт в прошлые месяцы. Сумма в месяц останется прежней, собрано — с нуля.')) return;
-  data.months.unshift({ month: nm, goal: cur.goal, collected: 0 });
+  if (!confirm('Начать ' + monthLabel(nm) + '? ' + monthLabel(cur.month) + ' уйдёт в прошлые месяцы. Сумма в месяц и «на что» останутся прежними — поправьте, если нужно. Собрано — с нуля.')) return;
+  data.months.unshift({ month: nm, goal: cur.goal, collected: 0, note: cur.note || '' });
   renderMonths();
   markDirty();
 });

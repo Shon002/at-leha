@@ -22,6 +22,9 @@ function render(d) {
   show('noGoal', p.goal === 0);
   show('hasGoal', p.goal > 0);
   show('pill', p.goal > 0);
+  show('reportBtn', p.goal > 0);
+  $('need').textContent = (m && m.note) || '';
+  show('needBox', !!(m && m.note));
   if (p.goal > 0) {
     $('collected').textContent = rub(p.collected);
     $('goal').textContent = rub(p.goal);
@@ -69,6 +72,13 @@ function render(d) {
     fill.style.width = Math.min(pp.pct, 100) + '%';
     bar.append(fill);
     li.append(row, bar);
+    if (pm.note) {
+      const note = document.createElement('p');
+      note.className = 'pre muted small';
+      note.style.marginTop = '6px';
+      note.textContent = pm.note;
+      li.append(note);
+    }
     ul.append(li);
   }
   show('historySec', past.length > 0);
@@ -137,11 +147,28 @@ $('copyBtn').addEventListener('click', async () => {
 // ---------- картинка-отчёт ----------
 
 const W = 1080, H = 1350, PAD = 80;
+// «Светлый рассвет»: кремовый фон как на сайте, тёплое свечение в углах.
 const RC = {
-  bg: '#1D2340', ink: '#F4EEE4', muted: '#A6A9C2',
+  bg: '#FBF5EC', ink: '#1D2340', muted: '#5E6480', hi: '#D9480F',
   a1: '#E8553D', a2: '#F5A524',
-  track: 'rgba(255,255,255,0.13)', box: 'rgba(255,255,255,0.07)',
+  track: 'rgba(29,35,64,0.10)', box: 'rgba(29,35,64,0.05)',
 };
+
+function paintBackground(x) {
+  x.fillStyle = RC.bg;
+  x.fillRect(0, 0, W, H);
+  let g = x.createRadialGradient(W - 20, 20, 0, W - 20, 20, 760);
+  g.addColorStop(0, 'rgba(245,165,36,0.42)');
+  g.addColorStop(0.5, 'rgba(232,85,61,0.14)');
+  g.addColorStop(1, 'rgba(232,85,61,0)');
+  x.fillStyle = g;
+  x.fillRect(0, 0, W, H);
+  g = x.createRadialGradient(0, H, 0, 0, H, 700);
+  g.addColorStop(0, 'rgba(232,85,61,0.12)');
+  g.addColorStop(1, 'rgba(232,85,61,0)');
+  x.fillStyle = g;
+  x.fillRect(0, 0, W, H);
+}
 const FONT_SAMPLE = 'Собрано из на месяц 0123456789 ₽ %·— ABC';
 
 function roundRect(x, left, top, w, h, r) {
@@ -170,8 +197,10 @@ function wrapLines(x, text, maxW, maxLines) {
   if (lines.length > maxLines) {
     lines.length = maxLines;
     let last = lines[maxLines - 1];
-    while (last && x.measureText(last + '…').width > maxW) last = last.slice(0, -1);
-    lines[maxLines - 1] = last.trimEnd() + '…';
+    if (!/[.!?…]$/.test(last)) {   // строка кончается точкой — многоточие не нужно
+      while (last && x.measureText(last + '…').width > maxW) last = last.slice(0, -1);
+      lines[maxLines - 1] = last.trimEnd() + '…';
+    }
   }
   return lines;
 }
@@ -200,17 +229,10 @@ async function drawReport(d) {
   const x = c.getContext('2d');
   const maxW = W - 2 * PAD;
 
-  x.fillStyle = RC.bg;
-  x.fillRect(0, 0, W, H);
-  const sun = x.createRadialGradient(W - 40, 40, 0, W - 40, 40, 640);
-  sun.addColorStop(0, 'rgba(245,165,36,0.50)');
-  sun.addColorStop(0.45, 'rgba(232,85,61,0.22)');
-  sun.addColorStop(1, 'rgba(232,85,61,0)');
-  x.fillStyle = sun;
-  x.fillRect(0, 0, W, H);
+  paintBackground(x);
 
-  let y = 130;
-  x.fillStyle = RC.a2;
+  let y = 120;
+  x.fillStyle = RC.hi;
   x.font = '800 30px Manrope, sans-serif';
   if ('letterSpacing' in x) x.letterSpacing = '3px';
   x.fillText(('Ежемесячный сбор · ' + monthLabel(m.month)).toUpperCase(), PAD, y);
@@ -220,26 +242,26 @@ async function drawReport(d) {
   x.fillStyle = RC.ink;
   x.font = '700 56px Unbounded, sans-serif';
   for (const line of wrapLines(x, d.title || '', maxW, 2)) {
-    y += 70;
+    y += 68;
     x.fillText(line, PAD, y);
   }
 
-  y += 86;
+  y += 80;
   x.fillStyle = RC.muted;
   x.font = '700 34px Manrope, sans-serif';
   x.fillText('Собрано', PAD, y);
 
-  y += 114;
+  y += 110;
   x.fillStyle = RC.ink;
   fitFont(x, rub(p.collected), '800', 116, 'Unbounded, sans-serif', maxW);
   x.fillText(rub(p.collected), PAD, y);
 
-  y += 58;
+  y += 54;
   x.fillStyle = RC.muted;
   x.font = '600 38px Manrope, sans-serif';
   x.fillText('из ' + rub(p.goal) + ' на месяц', PAD, y);
 
-  y += 44;
+  y += 40;
   const bh = 56;
   x.fillStyle = RC.track;
   roundRect(x, PAD, y, maxW, bh, bh / 2);
@@ -251,35 +273,49 @@ async function drawReport(d) {
     roundRect(x, PAD, y, Math.max(bh, maxW * Math.min(p.pct, 100) / 100), bh, bh / 2);
   }
 
-  y += bh + 54;
+  y += bh + 52;
   x.font = '800 36px Manrope, sans-serif';
   x.fillStyle = RC.ink;
-  x.fillText(p.pct + ' % собрано', PAD, y);
+  x.fillText(p.pct + '\u00A0% собрано', PAD, y);
   x.textAlign = 'right';
-  x.fillStyle = RC.a2;
-  x.fillText(p.done ? 'цель собрана' : 'не хватает ' + p.lackPct + ' %', W - PAD, y);
+  x.fillStyle = RC.hi;
+  x.fillText(p.done ? 'цель собрана' : 'не хватает ' + p.lackPct + '\u00A0%', W - PAD, y);
   x.textAlign = 'left';
 
-  y += 88;
   if (p.done) {
-    x.fillStyle = RC.a2;
+    x.fillStyle = RC.hi;
     x.font = '700 52px Unbounded, sans-serif';
-    for (const line of wrapLines(x, 'Цель месяца собрана — спасибо!', maxW, 2)) {
+    wrapLines(x, 'Цель месяца собрана — спасибо!', maxW, 2).forEach((line, i) => {
+      y += i ? 64 : 92;
       x.fillText(line, PAD, y);
-      y += 64;
-    }
+    });
   } else {
+    y += 80;
     x.fillStyle = RC.muted;
     x.font = '700 34px Manrope, sans-serif';
     x.fillText('Осталось собрать', PAD, y);
-    y += 92;
-    x.fillStyle = RC.a2;
+    y += 88;
+    x.fillStyle = RC.hi;
     fitFont(x, rub(p.left), '800', 84, 'Unbounded, sans-serif', maxW);
     x.fillText(rub(p.left), PAD, y);
   }
 
-  // как помочь
+  // на что нужны деньги — столько строк, сколько влезет до блока «Как помочь»
   const top = H - 370;
+  if (m.note) {
+    x.fillStyle = RC.ink;
+    x.font = '600 28px Manrope, sans-serif';
+    const fits = Math.floor((top - 30 - (y + 56)) / 38) + 1;
+    if (fits > 0) {
+      y += 18;
+      for (const line of wrapLines(x, 'На что: ' + m.note.trim().split(/\s*\n+\s*/).join(' · '), maxW, fits)) {
+        y += 38;
+        x.fillText(line, PAD, y);
+      }
+    }
+  }
+
+  // как помочь
   x.fillStyle = RC.box;
   roundRect(x, PAD - 32, top, W - 2 * PAD + 64, 280, 28);
   let by = top + 58;
