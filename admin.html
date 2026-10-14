@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; connect-src 'self' https://api.github.com; img-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Админка сбора</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Unbounded:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <p class="kicker">Админка</p>
+    <h1>Ежемесячный сбор</h1>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="card" id="loading">Загрузка…</p>
+  <p class="card msg err" id="fatal" hidden></p>
+
+  <!-- настройка входа: делает помощник — в первый раз, при новом пароле и когда ключ истёк -->
+  <section class="card" id="setupSec" hidden>
+    <h2>Настройка входа</h2>
+    <p class="small muted">Делает помощник: в первый раз, когда нужен новый пароль и когда ключ истёк.
+      Сайт хранит данные в своём репозитории на GitHub, поэтому админке нужен ключ GitHub
+      с правом записи только в этот репозиторий. Ключ шифруется логином и паролем — админ входит только по ним.</p>
+    <ol class="steps">
+      <li>Откройте <a href="https://github.com/settings/personal-access-tokens" target="_blank" rel="noopener">ключи на GitHub</a> (Fine-grained tokens).
+        Ключ уже есть — откройте его и нажмите <b>Regenerate token</b>: старый ключ и все старые пароли перестанут работать.
+        Ключа нет — Generate new token. Если сделали новый ключ, а старый был, — удалите старый.</li>
+      <li>Resource owner — владелец сайта. Expiration — самый долгий срок.
+        Repository access — <b>Only select repositories</b> → только этот репозиторий.</li>
+      <li>Permissions → Repository permissions → <b>Contents: Read and write</b>. Generate token.</li>
+      <li>Вставьте ключ ниже, задайте логин, нажмите «Придумать пароль» и передайте логин и пароль админу.</li>
+    </ol>
+    <form id="setupForm" autocomplete="off">
+      <label for="sToken" style="margin-top:16px">Ключ GitHub</label>
+      <input id="sToken" type="password" required placeholder="github_pat_…" autocomplete="off">
+      <label for="sLogin">Логин админа</label>
+      <input id="sLogin" required autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false">
+      <div class="two">
+        <div>
+          <label for="sPass">Пароль</label>
+          <input id="sPass" type="password" required minlength="10" autocomplete="new-password">
+        </div>
+        <div>
+          <label for="sPass2">Ещё раз</label>
+          <input id="sPass2" type="password" required minlength="10" autocomplete="new-password">
+        </div>
+      </div>
+      <button class="btn sm ghost" type="button" id="genPass" style="margin-top:10px">Придумать пароль</button>
+      <p class="hint">Не короче 10 символов, не только цифры, без логина внутри. Надёжнее — «Придумать пароль».</p>
+      <button class="btn wide" type="submit">Сохранить и войти</button>
+      <p class="msg" id="setupMsg"></p>
+      <p class="hint">Вход по новому паролю заработает примерно через минуту.</p>
+    </form>
+    <p class="small" id="backToLogin" hidden><a href="#" id="toLogin">← Вернуться ко входу</a></p>
+  </section>
+
+  <!-- вход -->
+  <section class="card" id="loginSec" hidden>
+    <h2>Вход</h2>
+    <form id="loginForm">
+      <label for="lLogin">Логин</label>
+      <input id="lLogin" required autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false">
+      <label for="lPass">Пароль</label>
+      <input id="lPass" type="password" required autocomplete="current-password">
+      <button class="btn wide" type="submit">Войти</button>
+      <p class="msg" id="loginMsg"></p>
+    </form>
+    <p class="small muted" style="margin-top:16px"><a href="help.html">Инструкция</a> · <a href="#" id="toSetup">Настройка входа</a> — для помощника.</p>
+  </section>
+
+  <!-- рабочая часть -->
+  <div id="app" hidden>
+    <section class="card">
+      <h2 id="curTitle">Сбор за месяц</h2>
+      <div class="two">
+        <div>
+          <label for="goalIn">Сумма в месяц, ₽</label>
+          <input id="goalIn" type="number" min="0" step="1" inputmode="numeric">
+        </div>
+        <div>
+          <label for="collIn" id="collLabel">Собрано, ₽</label>
+          <input id="collIn" type="number" min="0" step="1" inputmode="numeric">
+        </div>
+      </div>
+      <p class="hint" id="curPreview"></p>
+      <button class="btn ghost wide" type="button" id="newMonthBtn">Начать новый месяц</button>
+      <details id="pastBox">
+        <summary>Прошлые месяцы</summary>
+        <div id="pastList"></div>
+      </details>
+    </section>
+
+    <section class="card">
+      <h2>Тексты на сайте</h2>
+      <label for="titleIn">Заголовок</label>
+      <input id="titleIn">
+      <label for="aboutIn">О сборе</label>
+      <textarea id="aboutIn" rows="6"></textarea>
+      <label for="meIn">О себе — своими словами</label>
+      <textarea id="meIn" rows="6" placeholder="Пусто — раздел на сайте не показывается"></textarea>
+      <label for="mePhotoIn">Фото для «О себе» (по желанию)</label>
+      <img class="preview-img" id="mePreview" alt="" hidden>
+      <input id="mePhotoIn" type="file" accept="image/*">
+      <button class="btn sm danger" type="button" id="meRemove" style="margin-top:8px" hidden>Убрать фото</button>
+      <label for="payToIn">Куда переводить — номер телефона или карты</label>
+      <input id="payToIn">
+      <label for="payNoteIn">Пояснение к переводу</label>
+      <textarea id="payNoteIn" rows="4"></textarea>
+    </section>
+
+    <div class="savebar">
+      <button class="btn" type="button" id="saveBtn">Сохранить</button>
+      <p class="msg" id="saveMsg"></p>
+    </div>
+
+    <section class="card">
+      <h2>Новая запись: отчёт или новость</h2>
+      <label for="newsText">Текст</label>
+      <textarea id="newsText" rows="4"></textarea>
+      <label for="newsPhoto">Фото (по желанию)</label>
+      <input id="newsPhoto" type="file" accept="image/*">
+      <img class="preview-img" id="newsPreview" alt="" hidden>
+      <button class="btn wide" type="button" id="publishBtn">Опубликовать</button>
+      <p class="msg" id="newsMsg"></p>
+    </section>
+
+    <section class="card">
+      <h2>Опубликованные записи</h2>
+      <div id="postList"></div>
+      <p class="muted small" id="noPosts">Записей пока нет.</p>
+      <p class="msg" id="postMsg"></p>
+    </section>
+
+    <p class="small" style="text-align:center">
+      <a href="./" target="_blank" rel="noopener">Открыть сайт</a> · <a href="help.html" target="_blank" rel="noopener">Инструкция</a> · <a href="#" id="logoutBtn">Выйти</a>
+    </p>
+  </div>
+</main>
+
+<script src="common.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Ежемесячный сбор</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Unbounded:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <p class="kicker">Ежемесячный сбор</p>
+    <h1 id="title">Загрузка…</h1>
+  </div>
+</header>
+
+<main class="wrap">
+  <p id="loadErr" class="card msg err" hidden>Не удалось загрузить данные. Обновите страницу.</p>
+
+  <section class="card" id="meter" hidden>
+    <div class="meter-head">
+      <span class="month" id="monthLabel"></span>
+      <span class="pill" id="pill"></span>
+    </div>
+    <div id="noGoal" class="muted" hidden>Сумма на месяц пока не указана.</div>
+    <div id="hasGoal">
+      <div class="big">
+        <span class="sum" id="collected"></span>
+        <span class="of">из <b id="goal"></b></span>
+      </div>
+      <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="bar">
+        <div class="fill" id="fill"></div>
+      </div>
+      <div class="stats">
+        <div><small>Собрано</small><b id="pct"></b></div>
+        <div class="left"><small>Осталось собрать</small><b id="left"></b></div>
+      </div>
+      <button class="btn wide" id="reportBtn" type="button">Картинка-отчёт для чата</button>
+    </div>
+  </section>
+
+  <section class="card" id="help" hidden>
+    <h2>Как помочь</h2>
+    <div class="payto" id="paytoRow">
+      <span class="num" id="payTo"></span>
+      <button class="btn sm ghost" id="copyBtn" type="button">Скопировать</button>
+    </div>
+    <p class="pre muted" id="payNote"></p>
+  </section>
+
+  <section class="card" id="aboutSec" hidden>
+    <h2>О сборе</h2>
+    <p class="pre" id="about"></p>
+  </section>
+
+  <section class="card" id="meSec" hidden>
+    <h2>О себе</h2>
+    <img class="me-photo" id="mePhoto" alt="" hidden>
+    <p class="pre" id="me"></p>
+  </section>
+
+  <section class="card" id="historySec" hidden>
+    <h2>Прошлые месяцы</h2>
+    <ul class="history" id="history"></ul>
+  </section>
+
+  <section id="newsSec" hidden>
+    <h2 style="margin-top:28px">Отчёты и новости</h2>
+    <div id="news"></div>
+  </section>
+</main>
+
+<footer class="wrap">
+  <span id="updated"></span>
+  <span> · </span><a href="admin.html">Вход для админа</a>
+</footer>
+
+<dialog id="reportDlg">
+  <img id="reportImg" alt="Картинка-отчёт о сборе">
+  <p class="hint">На телефоне картинку можно сохранить долгим нажатием.</p>
+  <div class="dlg-actions">
+    <button class="btn" id="shareBtn" type="button" hidden>Поделиться</button>
+    <button class="btn" id="downloadBtn" type="button">Скачать</button>
+    <button class="btn ghost" id="closeBtn" type="button">Закрыть</button>
+  </div>
+</dialog>
+
+<script src="common.js"></script>
+<script src="site.js"></script>
+</body>
+</html>
