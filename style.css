@@ -209,6 +209,8 @@ input[type="file"] { padding: 9px; }
 .adm-post .t { flex: 1; min-width: 0; font-size: 14px; }
 .adm-post .t p { margin: 2px 0 0; white-space: pre-line; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .preview-img { margin-top: 10px; max-height: 220px; border-radius: 12px; }
+.adm-nav { display: flex; flex-wrap: wrap; gap: 10px; margin: 24px 0 48px; }
+.adm-nav .btn { flex: 1 1 140px; min-height: 52px; font-size: 17px; }
 details summary { cursor: pointer; font-weight: 700; margin-top: 18px; }
 ol.steps { padding-left: 20px; margin: 8px 0 0; font-size: 14px; }
 ol.steps li { margin: 4px 0; }
