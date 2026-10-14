@@ -111,6 +111,7 @@ function render(d) {
   show('newsSec', (d.news || []).length > 0);
 
   $('updated').textContent = d.updated ? 'Обновлено ' + dayLabel(dateOf(d.updated)) : '';
+  show('sep', !!d.updated);
 }
 
 // ---------- копирование номера ----------
