@@ -8,8 +8,8 @@
   "months": [
     {
       "month": "2026-10",
-      "goal": 10000,
-      "collected": 1000
+      "goal": 20000,
+      "collected": 5000
     }
   ],
   "news": [
@@ -20,5 +20,5 @@
       "photo": "photos/2026-10-14-mv8fevt398vb.jpg"
     }
   ],
-  "updated": "2026-10-14T18:11:42.756Z"
+  "updated": "2026-10-14T18:12:45.802Z"
 }
