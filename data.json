@@ -12,6 +12,13 @@
       "collected": 0
     }
   ],
-  "news": [],
-  "updated": "2026-10-14T18:10:38.270Z"
+  "news": [
+    {
+      "id": "mv8fevt398vb",
+      "date": "2026-10-14",
+      "text": "Школа Ветра",
+      "photo": "photos/2026-10-14-mv8fevt398vb.jpg"
+    }
+  ],
+  "updated": "2026-10-14T18:11:24.663Z"
 }
