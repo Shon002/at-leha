@@ -38,6 +38,8 @@ body {
   background: var(--bg);
   color: var(--ink);
   font: 16px/1.55 var(--font-body);
+  /* запас прокрутки внизу всех страниц: последний блок не прилипает к краю экрана */
+  padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px));
 }
 img { max-width: 100%; display: block; }
 a { color: var(--accent); }
@@ -156,7 +158,7 @@ h2 {
 .post .body { padding: 16px 20px 18px; }
 .post time { display: block; font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
 
-footer { padding: 24px 0 48px; text-align: center; font-size: 14px; color: var(--muted); }
+footer { padding: 24px 0; text-align: center; font-size: 14px; color: var(--muted); }
 footer a { color: var(--muted); }
 
 /* окно картинки-отчёта */
@@ -209,7 +211,7 @@ input[type="file"] { padding: 9px; }
 .adm-post .t { flex: 1; min-width: 0; font-size: 14px; }
 .adm-post .t p { margin: 2px 0 0; white-space: pre-line; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .preview-img { margin-top: 10px; max-height: 220px; border-radius: 12px; }
-.adm-nav { display: flex; flex-wrap: wrap; gap: 10px; margin: 24px 0 0; padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px)); }
+.adm-nav { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
 .adm-nav .btn { flex: 1 1 140px; min-height: 52px; font-size: 17px; }
 details summary { cursor: pointer; font-weight: 700; margin-top: 18px; }
 ol.steps { padding-left: 20px; margin: 8px 0 0; font-size: 14px; }
